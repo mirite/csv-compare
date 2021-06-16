@@ -9,28 +9,34 @@ def filter_on_field(source_record, source_field, target, target_field):
 	for target_record in target:
 		# print(source_record[source_field], target_record[target_field] )
 		if ( source_record[source_field] == target_record[target_field] ):
-			output = output + 'INSERT INTO wpo0_usermeta (user_id, meta_key, meta_value) VALUES (' + source_record['ID'] + ', "pets-name", "' + target_record['Pets Name'] + '");\n'
-			output = output + 'INSERT INTO wpo0_usermeta (user_id, meta_key, meta_value) VALUES (' + source_record['ID'] + ', "instagram-handle", "' + target_record['Instagram Handle'] + '");\n'
-			output = output + 'INSERT INTO wpo0_usermeta (user_id, meta_key, meta_value) VALUES (' + source_record['ID'] + ', "pets-birthday", "' + target_record['Birthday/Gotchaday'] + '");\n'
+			target_record['Length (in)'] = source_record['Length']
+			target_record['Width (in)'] = source_record['Width']
+			target_record['Height (in)'] = source_record['Height']
+			target_record['Weight (lbs)'] = source_record['Weight']
 
 
-			return True
+			return target_record
 	return False
 
-source = loadCSV('users.csv')
-target = loadCSV('emails.csv')
+source = loadCSV('productWeights.csv')
+target = loadCSV('productList.csv')
 
 matched = []
 unmatched = []
 
 for source_record in source:
-	if filter_on_field(source_record, 'user_email', target,'user_email'):
-		matched.append(source_record)
+	result_record = filter_on_field(source_record, 'sku', target,'SKU')
+	if result_record:
+		matched.append(result_record)
 	else:
 		unmatched.append(source_record)
 
-for matched_entry in matched:
-	print(matched_entry)
+for unmatched_entry in unmatched:
+	print(unmatched_entry)
 
-with open("out.sql", "w") as f:
-	f.write(output)
+with open("out.csv", "w", encoding="utf-8") as f:
+	headers = matched[0].keys()
+	print(headers)
+	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
+	writer.writeheader()
+	writer.writerows(matched)
