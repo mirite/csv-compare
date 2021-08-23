@@ -18,31 +18,31 @@ def filter_on_field(source_record, source_field, target, target_field):
 			return target_record
 	return False
 
-source = loadCSV('a.csv')
-target = loadCSV('b.csv')
+source = loadCSV('b.csv')
+target = loadCSV('a.csv')
 
 matched = []
 unmatched = []
 
+def filterPartial(source_entry):
+	return not (' - P' in source_entry['Name'].strip())
+
+source = list(filter(filterPartial, source))
+
 for source_record in source:
-	result_record = filter_on_field(source_record, 'SKU', target,'Name')
+	result_record = filter_on_field(source_record, 'Name', target,'SKU')
 	if result_record:
 		matched.append(result_record)
 	else:
 		unmatched.append(source_record)
 
-def filterUnmatched(unmatched_entry):
-	return not (unmatched_entry['SKU'].strip() == '' or 'composite' in unmatched_entry['Type'] or 'variable' in unmatched_entry['Type'])
-
-unmatched = list(filter(filterUnmatched, unmatched))
-
-with open("matcheda.csv", "w", encoding="utf-8") as f:
+with open("matchedb.csv", "w", encoding="utf-8") as f:
 	headers = matched[0].keys()
 	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
 	writer.writeheader()
 	writer.writerows(matched)
 
-with open("unmatcheda.csv", "w", encoding="utf-8") as f:
+with open("unmatchedb.csv", "w", encoding="utf-8") as f:
 	headers = unmatched[0].keys()
 	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
 	writer.writeheader()
