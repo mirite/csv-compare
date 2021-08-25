@@ -34,16 +34,17 @@ for source_record in source:
 def filterUnmatched(unmatched_entry):
 	return not (unmatched_entry['SKU'].strip() == '' or 'composite' in unmatched_entry['Type'] or 'variable' in unmatched_entry['Type'])
 
+def writeOutput(file, entries):
+	if(len(entries) == 0):
+		entries = [{'':'No Results'}]
+
+	with open(file, "w", encoding="utf-8") as f:
+		headers = entries[0].keys()
+		writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
+		writer.writeheader()
+		writer.writerows(entries)
+
 unmatched = list(filter(filterUnmatched, unmatched))
 
-with open("matcheda.csv", "w", encoding="utf-8") as f:
-	headers = matched[0].keys()
-	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
-	writer.writeheader()
-	writer.writerows(matched)
-
-with open("unmatcheda.csv", "w", encoding="utf-8") as f:
-	headers = unmatched[0].keys()
-	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
-	writer.writeheader()
-	writer.writerows(unmatched)
+writeOutput("matcheda.csv", matched)
+writeOutput("unmatcheda.csv", unmatched)

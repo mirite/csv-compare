@@ -36,14 +36,15 @@ for source_record in source:
 	else:
 		unmatched.append(source_record)
 
-with open("matchedb.csv", "w", encoding="utf-8") as f:
-	headers = matched[0].keys()
-	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
-	writer.writeheader()
-	writer.writerows(matched)
+def writeOutput(file, entries):
+	if(len(entries) == 0):
+		entries = [{'':'No Results'}]
 
-with open("unmatchedb.csv", "w", encoding="utf-8") as f:
-	headers = unmatched[0].keys()
-	writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
-	writer.writeheader()
-	writer.writerows(unmatched)
+	with open(file, "w", encoding="utf-8") as f:
+		headers = entries[0].keys()
+		writer = csv.DictWriter(f,headers, delimiter=',', lineterminator='\n', extrasaction='ignore')
+		writer.writeheader()
+		writer.writerows(entries)
+
+writeOutput("matchedb.csv", matched)
+writeOutput("unmatchedb.csv", unmatched)
