@@ -22,21 +22,26 @@ def write_results(path, list_to_write):
 		writer.writeheader()
 		writer.writerows(list_to_write)
 
-source = loadCSV('b.csv')
-target = loadCSV('a.csv')
+def check_for_matches(source, target):
+	matched = []
+	unmatched = []
 
-matched = []
-unmatched = []
+	for source_record in source:
+		result_record = filter_on_field(source_record, 'Email', target,'Email')
+		if result_record:
+			matched.append(result_record)
+		else:
+			unmatched.append(source_record)
 
-for source_record in source:
-	result_record = filter_on_field(source_record, 'Email', target,'Email')
-	if result_record:
-		matched.append(result_record)
-	else:
-		unmatched.append(source_record)
+	return matched, unmatched
 
-for unmatched_entry in unmatched:
-	print(unmatched_entry)
+source_a = loadCSV('a.csv')
+source_b = loadCSV('b.csv')
 
-write_results("matched.csv", matched)
-write_results("unmatched.csv", unmatched)
+matched_a, unmatched_a = check_for_matches(source_a, source_b);
+write_results("matched_source_a.csv", matched_a)
+write_results("unmatched_source_a.csv", unmatched_a)
+
+matched_b, unmatched_b = check_for_matches(source_b, source_a);
+write_results("matched_source_b.csv", matched_b)
+write_results("unmatched_source_b.csv", unmatched_b)
