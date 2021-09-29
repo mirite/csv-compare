@@ -1,17 +1,19 @@
 import csv
-output = ""
+
+#Loads the CSV from the path snd returns it as a list
 def loadCSV(path):
 	with open(path, newline='', encoding="utf-8-sig") as csvfile:
 		return list(csv.DictReader(csvfile, delimiter=','))
 
-def filter_on_field(source_record, source_field, target, target_field):
-	global output
+#Searches for a record in target with the same value in the coinciding field.
+def find_match_on_field(source_record, source_field, target, target_field):
 	for target_record in target:
 		# print(source_record[source_field], target_record[target_field] )
 		if ( source_record[source_field] == target_record[target_field] ):
 			return target_record
 	return False
 
+#Writes the provided list as a csv
 def write_results(path, list_to_write):
 	if len(list_to_write) == 0:
 		print("No records to write to",path)
@@ -22,12 +24,13 @@ def write_results(path, list_to_write):
 		writer.writeheader()
 		writer.writerows(list_to_write)
 
+#Finds matched and unmatched fields from the source in the target
 def check_for_matches(source, target):
 	matched = []
 	unmatched = []
 
 	for source_record in source:
-		result_record = filter_on_field(source_record, 'Email', target,'Email')
+		result_record = find_match_on_field(source_record, 'Email', target,'Email')
 		if result_record:
 			matched.append(result_record)
 		else:
@@ -35,13 +38,13 @@ def check_for_matches(source, target):
 
 	return matched, unmatched
 
+#Finds the matched and unmatched records in both directions.
+def process_set(set_name, source, target):
+	matched, unmatched = check_for_matches(source, target);
+	write_results("matched_source_" + set_name + ".csv", matched)
+	write_results("unmatched_source_" + set_name + ".csv", unmatched)
+
 source_a = loadCSV('a.csv')
 source_b = loadCSV('b.csv')
-
-matched_a, unmatched_a = check_for_matches(source_a, source_b);
-write_results("matched_source_a.csv", matched_a)
-write_results("unmatched_source_a.csv", unmatched_a)
-
-matched_b, unmatched_b = check_for_matches(source_b, source_a);
-write_results("matched_source_b.csv", matched_b)
-write_results("unmatched_source_b.csv", unmatched_b)
+process_set('a', source_a, source_b)
+process_set('b', source_b, source_a)
