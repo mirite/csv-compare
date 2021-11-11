@@ -10,6 +10,10 @@ def find_match_on_field(source_record, source_field, target, target_field):
 	for target_record in target:
 		# print(source_record[source_field], target_record[target_field] )
 		if ( source_record[source_field] == target_record[target_field] ):
+			if target_field == 'SKU':
+				target_record['Stock'] = source_record['Variant Inventory Qty']
+				target_record['Regular price'] = source_record['Variant Price']
+
 			return target_record
 	return False
 
