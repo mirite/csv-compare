@@ -25,12 +25,12 @@ def write_results(path, list_to_write):
 		writer.writerows(list_to_write)
 
 #Finds matched and unmatched fields from the source in the target
-def check_for_matches(source, target):
+def check_for_matches(source, target, source_field, target_field):
 	matched = []
 	unmatched = []
 
 	for source_record in source:
-		result_record = find_match_on_field(source_record, 'Email', target,'Email')
+		result_record = find_match_on_field(source_record, source_field, target, target_field)
 		if result_record:
 			matched.append(result_record)
 		else:
@@ -39,12 +39,15 @@ def check_for_matches(source, target):
 	return matched, unmatched
 
 #Finds the matched and unmatched records in both directions.
-def process_set(set_name, source, target):
-	matched, unmatched = check_for_matches(source, target);
+def process_set(set_name, source, target, source_field, target_field):
+	matched, unmatched = check_for_matches(source, target, source_field, target_field);
 	write_results("matched_source_" + set_name + ".csv", matched)
 	write_results("unmatched_source_" + set_name + ".csv", unmatched)
 
+a_field = 'Variant SKU'
+b_field = 'SKU'
+
 source_a = loadCSV('a.csv')
 source_b = loadCSV('b.csv')
-process_set('a', source_a, source_b)
-process_set('b', source_b, source_a)
+process_set('a', source_a, source_b, a_field, b_field)
+process_set('b', source_b, source_a, b_field, a_field)
